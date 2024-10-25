@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // ! LOCAL STORAGE - will need this to GET saved notes from current URL
   // ! will need to use it to save (SET) note
   // ! reference: https://blog.logrocket.com/localstorage-javascript-complete-guide/
+  // ! https://www.youtube.com/watch?v=5o8krh_Qduk
 
   // add event listen to button to save note
   saveBtn.addEventListener('click', function () {
