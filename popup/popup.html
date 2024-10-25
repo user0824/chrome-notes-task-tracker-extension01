@@ -4,10 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Awesome Note Taker!</title>
+    <link rel="stylesheet" href="./popup.css" />
   </head>
+  <script src="./popup.js"></script>
   <body>
+    <textarea name="notes" id="notes" placeholder="add note..."></textarea>
     <button id="saveNote">Save</button>
     <button id="addNote">Add</button>
-    <input type="text" id="noteField" />
+    <!-- this will render a toggle switch only in Safari!-->
+    <input type="checkbox" switch />
   </body>
 </html>

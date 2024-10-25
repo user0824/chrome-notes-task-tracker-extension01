@@ -2,9 +2,12 @@
   "manifest_version": 3,
   "name": "Awesome Note Taker!",
   "version": "1.0.0",
-  "permissions": ["storage", "activeTab", "tabs", "scripting"],
+  "permissions": ["storage", "activeTab", "tabs", "scripting", "sidePanel"],
   "action": {
     "default_popup": "popup.html"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
   },
   "background": {
     "service_worker": "service-worker.js"
