@@ -1,0 +1,49 @@
+body {
+  background-color: whitesmoke;
+}
+
+button {
+  margin: 10px;
+  padding: 10px 30px;
+  background-color: whitesmoke;
+  border: none;
+  color: #161a20;
+  border-radius: 1000px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+button::after {
+  content: '';
+  position: absolute;
+  height: 107%;
+  width: 102%;
+  border-radius: 1000px;
+  background-image: linear-gradient(to bottom right, #008cff, #e100ff);
+  z-index: -1;
+}
+
+button:hover {
+  color: whitesmoke;
+  z-index: 0;
+}
+button:active {
+  box-shadow: 10px 0 25px #008cff85, -10px 0 25px #e100ffbb;
+}
+
+textarea {
+  width: 275px;
+  height: 500px;
+  background-color: rgb(248, 208, 148);
+  border: none;
+  padding: 15px;
+  /* color: rgb(6, 22, 244); */
+  border-radius: 20px;
+}
+
+*:focus {
+  outline: none;
+}
