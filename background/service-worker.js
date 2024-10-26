@@ -1,18 +1,54 @@
-// * This linkes the side panel to the action icon
+// * Set up the side panel behavior on installation
 chrome.runtime.onInstalled.addListener(() => {
   chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
 });
-/*async function getCurrentTabUrl() {
-  let queryOptions = { active: true, lastFocusedWindow: true };
-  let [tab] = await chrome.tabs.query(queryOptions);
 
-  return tab ? tab.url : undefined;
-}
+// * Save notes when the extension or side panel is suspended (about to be closed)
+chrome.runtime.onSuspend.addListener(() => {
+  chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
+    if (tabs.length === 0) return;
+    const url = tabs[0].url;
 
-getCurrentTabUrl().then((tab) => {
-  console.log(tab);
+    if (url && !url.startsWith('chrome://')) {
+      chrome.storage.sync.get([url], (result) => {
+        const note = result[url] || '';
+        chrome.storage.sync.set({ [url]: note }, () => {
+          console.log('Note saved before extension unload for URL:', url);
+        });
+      });
+    }
+  });
 });
-*/
-chrome.tabs.onActivated.addListener((activeTab) => {
-  console.log(activeTab);
+
+// * Save notes when switching tabs
+chrome.tabs.onActivated.addListener((activeInfo) => {
+  chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
+    const tab = tabs[0];
+    if (tab) {
+      const url = tab.url;
+      if (url && !url.startsWith('chrome://')) {
+        chrome.storage.sync.get([url], (result) => {
+          const note = result[url] || '';
+          chrome.storage.sync.set({ [url]: note }, () => {
+            console.log('Note saved when switching tabs for URL:', url);
+          });
+        });
+      }
+    }
+  });
+});
+
+// * Save notes when the tab updates or loads a new page
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status === 'complete') {
+    const url = tab.url;
+    if (url && !url.startsWith('chrome://')) {
+      chrome.storage.sync.get([url], (result) => {
+        const note = result[url] || '';
+        chrome.storage.sync.set({ [url]: note }, () => {
+          console.log('Note saved on tab update for URL:', url);
+        });
+      });
+    }
+  }
 });

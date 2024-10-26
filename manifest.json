@@ -3,7 +3,7 @@
   "name": "Awesome Notes!",
   "description": "Extension that allows you to take notes on the current page",
   "version": "1.0.0",
-  "permissions": ["storage", "activeTab", "tabs", "scripting", "sidePanel"],
+  "permissions": ["storage", "activeTab", "tabs", "scripting", "sidePanel", "webNavigation"],
   "action": {
     "default_title": "Click to open panel"
   },

@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // * Function to dynamically update the note based on the current tab
   function dynamicNotes() {
     chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
+      if (tabs.length === 0) return;
       const url = tabs[0].url;
 
       //////////////////////////////////////////////////////////////////////////////////////
@@ -30,12 +31,9 @@ document.addEventListener('DOMContentLoaded', function () {
       //////////////////////////////////////////////////////////////////////////////////////
       // * Fetch existing note for this URL
       // * STORAGE SYNC - GET
+      // * Fetch and display the note specific to this URL
       chrome.storage.sync.get([url], function (result) {
-        if (result[url]) {
-          writeNote.value = result[url]; // Return note if it exists
-        } else {
-          writeNote.value = ''; // Otherwise display blank note
-        }
+        writeNote.value = result[url] || ''; // Show saved note or blank if none exists
       });
     });
   }
@@ -70,34 +68,36 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  //////////////////////////////////////////////////////////////////////////////////////
-
-  // * onUPDATED - Listen for page refreshes
-  // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/tabs/onUpdated
-  // https://www.youtube.com/watch?v=olLXAFJiL6Q
-  chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    if (changeInfo.status === 'complete') {
-      dynamicNotes(); // Update note when the page is loaded
+  // Save notes when the side panel is closed
+  window.addEventListener('beforeunload', function () {
+    if (currentUrl) {
+      const note = writeNote.value;
+      chrome.storage.sync.set({ [currentUrl]: note }, function () {
+        console.log(
+          'Note saved before closing side panel for URL:',
+          currentUrl
+        );
+      });
     }
   });
 
-  //////////////////////////////////////////////////////////////////////////////////////
-
-  // * onACTIVATED - Listen for tab changes
-  // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/tabs/onActivated
-  chrome.tabs.onActivated.addListener(() => {
-    dynamicNotes(); // Update note when switching tabs
+  // Save notes when switching tabs
+  chrome.tabs.onActivated.addListener(function () {
+    if (currentUrl) {
+      const note = writeNote.value;
+      chrome.storage.sync.set({ [currentUrl]: note }, function () {
+        console.log('Note saved before switching tabs for URL:', currentUrl);
+      });
+    }
+    dynamicNotes(); // Load the note for the newly activated tab
   });
 
   //////////////////////////////////////////////////////////////////////////////////////
-
-  // * onCOMMITTED - Listen for URL changes
-  // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/webNavigation/onCommitted
+  // Reload the note whenever a tab is switched, URL is entered manually, or page refresh completes
+  chrome.tabs.onActivated.addListener(dynamicNotes);
   chrome.webNavigation.onCommitted.addListener((details) => {
-    // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/webNavigation/onCommitted#frameid
     if (details.frameId === 0) {
-      dynamicNotes(); // Update note when a URL is manually entered
+      dynamicNotes();
     }
   });
 });
-//////////////////////////////////////////////////////////////////////////////////////
