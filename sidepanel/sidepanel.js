@@ -1,94 +1,103 @@
 document.addEventListener('DOMContentLoaded', function () {
   const writeNote = document.querySelector('#writeNote');
   const saveBtn = document.querySelector('#saveNote');
-  const addBtn = document.querySelector('#addNote');
   const clearBtn = document.querySelector('#clearNote');
-  let currentUrl = ''; // init current url field to bllank
-  // ! LOCAL STORAGE - will need this to GET saved notes from current URL
-  // ! will need to use it to save (SET) note
-  // ! reference: https://blog.logrocket.com/localstorage-javascript-complete-guide/
-  // ! https://www.youtube.com/watch?v=5o8krh_Qduk
+  const defaultPlaceholder = 'creativity starts here...';
+  let currentUrl = ''; // Initialize current URL field as blank
 
-  ///////////////////////////////////////////////////////////////////////////////////////////
-  // * wrapping query and GET into func to try to update notes when url changes
+  //////////////////////////////////////////////////////////////////////////////////////
+
+  // * Function to dynamically update the note based on the current tab
   function dynamicNotes() {
-    // * GET Notes from current URL
     chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
-      console.log(tabs);
       const url = tabs[0].url;
 
-      currentUrl = url;
+      //////////////////////////////////////////////////////////////////////////////////////
 
+      // * when opening a new tab or chrome url
+      if (!url || url.startsWith('chrome://')) {
+        writeNote.placeholder = 'Cannot save notes on this page';
+        writeNote.value = ''; // Clear previous content
+        currentUrl = '';
+        return;
+      }
+
+      //////////////////////////////////////////////////////////////////////////////////////
+
+      currentUrl = url; // get current url
+      writeNote.placeholder = defaultPlaceholder; // default placeholder text
+
+      //////////////////////////////////////////////////////////////////////////////////////
+      // * Fetch existing note for this URL
+      // * STORAGE SYNC - GET
       chrome.storage.sync.get([url], function (result) {
-        if (result[url]) writeNote.value = result[url]; // return note if exists
-        else writeNote.value = ''; // otherwise display blank note
+        if (result[url]) {
+          writeNote.value = result[url]; // Return note if it exists
+        } else {
+          writeNote.value = ''; // Otherwise display blank note
+        }
       });
     });
   }
-  ///////////////////////////////////////////////////////////////////////////////////////////
 
-  dynamicNotes(); // invoke func to load a note, if created
+  //////////////////////////////////////////////////////////////////////////////////////
 
-  ///////////////////////////////////////////////////////////////////////////////////////////
+  // * Load the note when the extension is opened
+  dynamicNotes();
 
-  // * SET Notes to URL
-  // add event listen to button to save note
+  //////////////////////////////////////////////////////////////////////////////////////
+
+  // * SAVE BUTTON - EVENT LISTENER (add note to current url)
+  // * STORAGE SYNC - SET
   saveBtn.addEventListener('click', function () {
     const note = writeNote.value;
     if (currentUrl) {
       chrome.storage.sync.set({ [currentUrl]: note }, function () {
-        console.log('Test Note saved func:', currentUrl);
-        // alert('Note Saved');
+        console.log('Note saved for URL:', currentUrl);
       });
     }
   });
 
-  ///////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////
 
-  // * REMOVE Notes from URL
-  // add event listener to button to clear note
+  // * CLEAR BUTTON - EVENT LISTENER (remove note from URL)
   clearBtn.addEventListener('click', function () {
-    writeNote.value = ''; // Clear the content in the editable div
+    writeNote.value = ''; // Clear the textarea content
     if (currentUrl) {
       chrome.storage.sync.remove([currentUrl], function () {
-        console.log('TEST Note deleted for:', url);
+        console.log('Note cleared for URL:', currentUrl);
       });
     }
   });
-  ///////////////////////////////////////////////////////////////////////////////////////////
 
-  // * Add listener for URL updates
+  //////////////////////////////////////////////////////////////////////////////////////
+
+  // * onUPDATED - Listen for page refreshes
   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/tabs/onUpdated
+  // https://www.youtube.com/watch?v=olLXAFJiL6Q
   chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if (changeInfo.status === 'complete') {
       dynamicNotes(); // Update note when the page is loaded
     }
   });
 
-  ///////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////
 
-  // * Add listener for to tab window changes:
+  // * onACTIVATED - Listen for tab changes
   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/tabs/onActivated
   chrome.tabs.onActivated.addListener(() => {
     dynamicNotes(); // Update note when switching tabs
   });
+
+  //////////////////////////////////////////////////////////////////////////////////////
+
+  // * onCOMMITTED - Listen for URL changes
+  // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/webNavigation/onCommitted
+  chrome.webNavigation.onCommitted.addListener((details) => {
+    // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/webNavigation/onCommitted#frameid
+    if (details.frameId === 0) {
+      dynamicNotes(); // Update note when a URL is manually entered
+    }
+  });
 });
-
-///////////////////////////////////////////////////////////////////////////////////////////
-
-// async function getCurrentTab() {
-//   let queryOptions = { active: true, lastFocusedWindow: true };
-//   // `tab` will either be a `tabs.Tab` instance or `undefined`.
-//   let [tab] = await chrome.tabs.query(queryOptions);
-//   return tab;
-// }
-
-// async function getCurrentTabUrl() {
-//   let queryOptions = { active: true, lastFocusedWindow: true };
-//   let [tab] = await chrome.tabs.query(queryOptions);
-//   return tab ? tab.url : undefined;
-// }
-
-// getCurrentTabUrl().then((tab) => {
-//   console.log(tab);
-// });
+//////////////////////////////////////////////////////////////////////////////////////
