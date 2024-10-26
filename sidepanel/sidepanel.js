@@ -35,10 +35,12 @@ document.addEventListener('DOMContentLoaded', function () {
   // add event listen to button to save note
   saveBtn.addEventListener('click', function () {
     const note = writeNote.value;
-    chrome.storage.sync.set({ [url]: note }, function () {
-      console.log('Test Note saved func:', url);
-      // alert('Note Saved');
-    });
+    if (currentUrl) {
+      chrome.storage.sync.set({ [currentUrl]: note }, function () {
+        console.log('Test Note saved func:', currentUrl);
+        // alert('Note Saved');
+      });
+    }
   });
 
   ///////////////////////////////////////////////////////////////////////////////////////////
@@ -47,12 +49,32 @@ document.addEventListener('DOMContentLoaded', function () {
   // add event listener to button to clear note
   clearBtn.addEventListener('click', function () {
     writeNote.value = ''; // Clear the content in the editable div
-    chrome.storage.sync.remove([url], function () {
-      console.log('TEST Note deleted for:', url);
-    });
+    if (currentUrl) {
+      chrome.storage.sync.remove([currentUrl], function () {
+        console.log('TEST Note deleted for:', url);
+      });
+    }
   });
   ///////////////////////////////////////////////////////////////////////////////////////////
+
+  // * Add listener for URL updates
+  // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/tabs/onUpdated
+  chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    if (changeInfo.status === 'complete') {
+      dynamicNotes(); // Update note when the page is loaded
+    }
+  });
+
+  ///////////////////////////////////////////////////////////////////////////////////////////
+
+  // * Add listener for to tab window changes:
+  // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/tabs/onActivated
+  chrome.tabs.onActivated.addListener(() => {
+    dynamicNotes(); // Update note when switching tabs
+  });
 });
+
+///////////////////////////////////////////////////////////////////////////////////////////
 
 // async function getCurrentTab() {
 //   let queryOptions = { active: true, lastFocusedWindow: true };
