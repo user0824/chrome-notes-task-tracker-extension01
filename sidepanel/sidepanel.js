@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const clearBtn = document.querySelector('#clearNote');
   const defaultPlaceholder = 'creativity starts here...';
   let currentUrl = ''; // Initialize current URL field as blank
+  const header = document.querySelector('#title');
 
   //////////////////////////////////////////////////////////////////////////////////////
 

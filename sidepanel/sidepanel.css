@@ -8,6 +8,7 @@ body {
   box-sizing: border-box;
 }
 h1 {
+  margin-top: 30px;
   text-align: center;
 }
 
@@ -32,13 +33,23 @@ button:hover {
   cursor: pointer;
 }
 
+#saveNote:hover {
+  background-color: rgb(24, 170, 24);
+  color: white;
+}
+
+#clearNote:hover {
+  background-color: red;
+  color: white;
+}
+
 button:active {
-  transform: scale(0.95);
+  transform: scale(0.97);
   color: white;
 }
 
 #saveNote:active {
-  background-color: #74aa9c;
+  background-color: rgb(24, 170, 24);
   box-shadow: 10px 0 25px #07c38785, -10px 0 25px #08813a77;
 }
 
@@ -49,27 +60,30 @@ button:active {
 
 textarea {
   width: 100%;
-  height: 70vh;
+  /* height: 70vh; */
   max-width: 100%;
-  min-height: 200px;
+  /* min-height: 200px; */
+  field-sizing: content; /* this AutoGrows the text area: https://davidwalsh.name/autogrow-textareas */
+  max-height: 70vh; /* limit the max height to 70% of view height */
   background-color: rgb(248, 208, 148);
   border: none;
   padding: 30px;
   margin-bottom: 10px;
   color: black;
   font-size: 18px;
-  border-radius: 20px;
+  border-radius: 30px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   box-sizing: border-box; /* Ensures padding is included in the width/height */
   transition: box-shadow 0.5s ease-in-out;
 }
 
-textarea:hover {
+textarea:hover,
+textarea:active {
   box-shadow: 10px 0 25px #008cff85, -10px 0 25px #e100ff77;
 }
 
 ::placeholder {
-  color: #161a20;
+  color: rgb(130, 117, 117);
   opacity: 0.7;
   font-style: italic;
 }
