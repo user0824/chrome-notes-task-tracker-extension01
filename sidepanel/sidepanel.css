@@ -1,5 +1,5 @@
 body {
-  background-color: gainsboro;
+  background-color: whitesmoke;
   display: flex;
   flex-direction: column;
   padding: 10px;
@@ -10,12 +10,13 @@ body {
 button {
   margin: 10px;
   padding: 10px 30px;
-  background-color: rgb(245, 233, 233);
+  background-color: rgb(222, 230, 239);
   border: none;
-  color: #161a20;
-  border-radius: 18px;
+  color: #000000;
+  border-radius: 25px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-size: 18px;
+  font-weight: bold;
   position: relative;
   display: flex;
   justify-content: center;
@@ -27,20 +28,33 @@ button::after {
   position: absolute;
   height: 107%;
   width: 102%;
-  border-radius: 18px;
-  background-image: linear-gradient(to bottom right, #ff7e5f, #feb47b);
+  border-radius: 25px;
+  /* background-image: #74aa9c; */
   z-index: -1;
 }
 
 button:hover {
-  color: whitesmoke;
   z-index: 0;
   cursor: pointer;
-  box-shadow: 10px 0 25px #008cff85, -10px 0 25px #e100ff77;
 }
 
 button:active {
   transform: scale(0.95);
+  color: white;
+}
+
+#saveNote:active {
+  background-color: #74aa9c;
+  box-shadow: 10px 0 25px #07c38785, -10px 0 25px #08813a77;
+}
+
+#clearNote:hover {
+  /* box-shadow: 10px 0 25px #ff00004b, -10px 0 25px #ff00843e; */
+}
+
+#clearNote:active {
+  background-color: red;
+  box-shadow: 10px 0 45px #ff00004b, -10px 0 25px #ff00843e;
 }
 
 textarea {
@@ -51,6 +65,7 @@ textarea {
   background-color: rgb(248, 208, 148);
   border: none;
   padding: 30px;
+  margin-bottom: 10px;
   color: black;
   font-size: 18px;
   border-radius: 20px;

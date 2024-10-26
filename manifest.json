@@ -1,6 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Awesome Note Taker!",
+  "name": "Awesome Notes!",
+  "description": "Extension that allows you to take notes on the current page",
   "version": "1.0.0",
   "permissions": ["storage", "activeTab", "tabs", "scripting", "sidePanel"],
   "action": {
