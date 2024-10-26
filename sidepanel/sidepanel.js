@@ -9,44 +9,55 @@ document.addEventListener('DOMContentLoaded', function () {
   // ! reference: https://blog.logrocket.com/localstorage-javascript-complete-guide/
   // ! https://www.youtube.com/watch?v=5o8krh_Qduk
 
-  // chrome.storage.local.set();
-  // chrome.storage.local.get();
+  ///////////////////////////////////////////////////////////////////////////////////////////
 
+  // * GET Notes from current URL
   chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
+    console.log(tabs);
     const url = tabs[0].url;
 
     chrome.storage.sync.get([url], function (result) {
-      writeNote.textContent = result[url];
+      if (result[url]) writeNote.value = result[url]; // return note if exists
     });
-  });
 
-  // async function getCurrentTab() {
-  //   let queryOptions = { active: true, lastFocusedWindow: true };
-  //   // `tab` will either be a `tabs.Tab` instance or `undefined`.
-  //   let [tab] = await chrome.tabs.query(queryOptions);
-  //   return tab;
-  // }
+    ///////////////////////////////////////////////////////////////////////////////////////////
 
-  // async function getCurrentTabUrl() {
-  //   let queryOptions = { active: true, lastFocusedWindow: true };
-  //   let [tab] = await chrome.tabs.query(queryOptions);
-  //   return tab ? tab.url : undefined;
-  // }
+    // * SET Notes to URL
+    // add event listen to button to save note
+    saveBtn.addEventListener('click', function () {
+      const note = writeNote.value;
+      chrome.storage.sync.set({ [url]: note }, function () {
+        console.log('Test Note saved func:', url);
+      });
+    });
 
-  // getCurrentTabUrl().then((tab) => {
-  //   console.log(tab);
-  // });
+    ///////////////////////////////////////////////////////////////////////////////////////////
 
-  // add event listen to button to save note
-  saveBtn.addEventListener('click', function () {
-    const note = writeNote.value;
-    // chrome.storage.sync.set({ key: value }).then(() => {
-    //   console.log('Value is set');
-    // });
-  });
-
-  // add event listener to button to clear note
-  clearBtn.addEventListener('click', function () {
-    writeNote.value = '';
+    // * REMOVE Notes from URL
+    // add event listener to button to clear note
+    clearBtn.addEventListener('click', function () {
+      writeNote.value = ''; // Clear the content in the editable div
+      chrome.storage.sync.remove([url], function () {
+        console.log('TEST Note deleted for:', url);
+      });
+    });
+    ///////////////////////////////////////////////////////////////////////////////////////////
   });
 });
+
+// async function getCurrentTab() {
+//   let queryOptions = { active: true, lastFocusedWindow: true };
+//   // `tab` will either be a `tabs.Tab` instance or `undefined`.
+//   let [tab] = await chrome.tabs.query(queryOptions);
+//   return tab;
+// }
+
+// async function getCurrentTabUrl() {
+//   let queryOptions = { active: true, lastFocusedWindow: true };
+//   let [tab] = await chrome.tabs.query(queryOptions);
+//   return tab ? tab.url : undefined;
+// }
+
+// getCurrentTabUrl().then((tab) => {
+//   console.log(tab);
+// });
